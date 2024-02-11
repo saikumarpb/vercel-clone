@@ -3,14 +3,18 @@ const path = require('path');
 const fs = require('fs');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const mime = require('mime-types');
+const dotenv = require('dotenv');
+
+// Load config
+dotenv.config();
 
 const PROJECT_ID = process.env.PROJECT_ID;
 
 const s3Client = new S3Client({
-    region: 'ap-south-1',
+    region: process.env.AWS_REGION,
     credentials: {
-        accessKeyId: 'AKIAVBYWDB7HPRUXLKH2',
-        secretAccessKey: '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',
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_S3_ACCESS_KEY_SECRET,
     },
 });
 
@@ -42,7 +46,7 @@ async function init() {
 
             console.log('Uploading ', filePath);
             const command = new PutObjectCommand({
-                Bucket: 'clone-vercel',
+                Bucket: process.env.AWS_S3_BUCKET,
                 Key: `__outputs/${PROJECT_ID}/${file}`,
                 Body: fs.createReadStream(filePath),
                 ContentType: mime.lookup(filePath),
